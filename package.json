@@ -1,0 +1,10 @@
+{
+  "name": "EVA-SFR",
+  "version": "1.0.0",
+  "description": "Affichage des stats des joueurs EVA de SFR Isneaville",
+  "main": "index.js",
+  "repository": "https://github.com/superfeedboy/eva-sfr",
+  "author": "Gilles COGNIN",
+  "license": "MIT",
+  "private": false
+}
