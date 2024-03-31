@@ -6,5 +6,16 @@
   "repository": "https://github.com/superfeedboy/eva-sfr",
   "author": "Gilles COGNIN",
   "license": "MIT",
-  "private": false
+  "private": false,
+  "scripts": {
+    "start:api": "cd packages/api && yarn start",
+    "start:front": "cd packages/front && yarn run dev"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "express-validator": "^7.0.1",
+    "nuxt": "^3.11.1",
+    "ts-node": "^10.9.2",
+    "vue": "^3.4.21"
+  }
 }
