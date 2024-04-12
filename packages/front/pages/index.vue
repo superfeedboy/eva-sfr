@@ -1,0 +1,4 @@
+<template>
+  <PopUp />
+  <Dashboard />
+</template>
