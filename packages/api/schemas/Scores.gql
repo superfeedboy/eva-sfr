@@ -1,0 +1,27 @@
+type Score {
+  gameid: ID!
+  playerid: ID!
+  game: Game!
+  team: Int!
+  kills: Int!
+  deaths: Int!
+  assists: Int!
+  kda: Float!
+  kd: Float!
+  points: Int!
+}
+
+type Query {
+  score(gameid: ID!, playerid: ID): Score
+  scores: [Score]
+}
+
+type Mutation {
+  addScore(gameid: ID!,
+  playerid: ID!,
+  team: Int!,
+  kills: Int!,
+  deaths: Int!,
+  assists: Int!,
+  points: Int!): Game
+}

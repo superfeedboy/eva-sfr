@@ -1,0 +1,25 @@
+scalar DateTime
+
+type Game {
+  gameid: ID!
+  seasonid: ID!
+  seasonname: String
+  date: DateTime!
+  mapid: ID!
+  map: String!
+  score: Int!
+  team: Int
+  win: Boolean!
+  team1Score: Int!
+  team2Score: Int!
+  personalScore: [Score!]
+}
+
+type Query {
+  game(gameid: ID!, date: DateTime!, map: String!): Game
+  games: [Game]
+}
+
+type Mutation {
+  addGame(seasonid: ID!, date: DateTime!, mapid: ID!, score1: Int!, score2: Int!): Game
+}

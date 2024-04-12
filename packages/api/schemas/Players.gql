@@ -1,0 +1,24 @@
+type GameResult {
+  list: [Game!]!
+  count: Int!
+}
+
+type Player {
+  playerid: ID!
+  pseudo: String!
+  name: String!
+  games: GameResult!
+  scores: [Score!]
+}
+
+type Query {
+  hello: String
+  player(playerid: ID!): Player
+  players: [Player]
+}
+
+type Mutation {
+  addPlayer(name: String!, position: String!, team: String!): Player
+  updatePlayer(id: ID!, name: String, position: String, team: String): Player
+  deletePlayer(id: ID!): Player
+}

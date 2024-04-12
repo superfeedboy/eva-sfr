@@ -1,0 +1,13 @@
+type Season {
+  seasonid: ID!
+  seasonname: String!
+}
+
+type Query {
+  season(seasonname: String!): Season
+  seasons: [Season]
+}
+
+type Mutation {
+  addSeason(seasonname: String!): Season
+}

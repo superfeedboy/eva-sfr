@@ -1,0 +1,13 @@
+type Map {
+  mapid: ID!
+  mapname: String!
+}
+
+type Query {
+  map(mapname: String!): Map
+  maps: [Map]
+}
+
+type Mutation {
+  addMap(mapname: String!): Map
+}
