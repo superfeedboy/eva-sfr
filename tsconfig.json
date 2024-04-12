@@ -1,0 +1,12 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@common/*": ["./packages/common/*"],
+			"@api/*": ["./packages/api/*"],
+			"@front/*": ["./packages/front/*"]
+		},
+		"module": "commonjs",
+		"esModuleInterop": true
+	}
+}

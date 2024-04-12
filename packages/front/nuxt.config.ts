@@ -7,6 +7,16 @@ export default defineNuxtConfig({
     "@formkit/nuxt",
     "@formkit/auto-animate",
     "nuxt-icon",
-    "@nuxtjs/google-fonts"
-  ]
-})
+    "@nuxtjs/google-fonts",
+  ],
+  css: ["./assets/style.css"],
+  googleFonts: {
+    families: {
+      "Titillium+Web": [400, 700],
+      Dosis: [400, 700],
+    },
+  },
+  build: {
+    transpile: ["echarts", "zrender", "tslib"],
+  },
+});

@@ -1,5 +1,10 @@
 #core
 node_modules
+*.SAVE
+*_SAVE
+*.afphoto
+*.sql
+/db
 
 #env
 .env
