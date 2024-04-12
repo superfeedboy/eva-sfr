@@ -1,4 +1,6 @@
 #core
+.vscode
+.DS_Store
 node_modules
 *.SAVE
 *_SAVE
