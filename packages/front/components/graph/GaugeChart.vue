@@ -3,6 +3,7 @@
 </template>
 
 <script setup lang="ts">
+import { useGraphsStore } from "@/stores/graphs.store";
 import { PieChart } from "echarts/charts";
 import type { GaugeSeriesOption } from "echarts/charts";
 import {
@@ -13,6 +14,7 @@ import {
 import { use } from "echarts/core";
 import type { ComposeOption } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
+import _ from "lodash";
 import VChart from "vue-echarts";
 
 import {
@@ -39,11 +41,16 @@ type EChartsOption = ComposeOption<
 
 const props = defineProps({
   series: Object, // as PropType<GaugeSeriesOption[]>,
+  graphId: {
+    type: String,
+    required: true,
+  },
   dataType: String,
   subTitle: String,
 });
-const { series, dataType, subTitle } = toRefs(props);
+const { series, graphId, dataType, subTitle } = toRefs(props);
 const gaugeDatas: Ref<PropType<GaugeSeriesOption[]>> = ref([]);
+const graphsStore = useGraphsStore();
 
 watchEffect(() => {
   if (series.value) {
@@ -71,11 +78,12 @@ watchEffect(() => {
   }
 });
 
-const option: Ref<EChartsOption> = ref({
+const defaultOptions = ref({
   darkMode: true,
   //   radius: "100%",
   title: {
     text: "Impact",
+    id: graphId.value,
     left: "center",
     top: "center",
     overflow: "break",
@@ -209,6 +217,47 @@ const option: Ref<EChartsOption> = ref({
       },
     },
   ],
+});
+
+const option: Ref<EChartsOption> = ref(defaultOptions.value);
+
+onMounted(() => {
+  watch(
+    () => graphsStore.graphs[graphId.value],
+    (newSerie) => {
+      console.log("New GAUGE Serie: ", newSerie);
+
+      //   if (series.value) {
+      //   console.log("Updating gauge serie", newSerie);
+
+      let index = 0;
+      const offsetsTitle = ["-100%", "0%", "100%"];
+      const offsetsDatas = ["-100%", "0%", "100%"];
+      gaugeDatas.value = Object.entries(newSerie.series).map(([key, value]) => {
+        const gaugeData = {
+          value: value,
+          name: key,
+          title: {
+            color: "white",
+            //   offsetCenter: ["0%", offsetsTitle[index]],
+            offsetCenter: [offsetsTitle[index], "25%"],
+          },
+          detail: {
+            valueAnimation: true,
+            //   offsetCenter: ["0%", offsetsDatas[index]],
+            offsetCenter: [offsetsDatas[index], "50%"],
+          },
+        };
+        console.log("Nouvelles options: ", newSerie.options);
+        console.log("Nouvelles datas: ", gaugeDatas.value);
+
+        index++;
+        return gaugeData;
+      });
+      option.value = _.merge({}, defaultOptions.value, newSerie.options);
+      //   }
+    }
+  );
 });
 </script>
 <style scoped>
