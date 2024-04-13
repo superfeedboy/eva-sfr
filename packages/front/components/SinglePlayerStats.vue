@@ -11,17 +11,44 @@
             deaths: deathsPerGame,
             assists: assistsPerGame,
           }"
+          graphId="fullKdaGraph"
           @updateKda="handleUpdateKda"
           dataType="Score"
           class="row-span-2"
         />
-        <div class="grid grid-cols-6">
+        <div class="relative grid grid-cols-6">
+          <div class="absolute top-0 left-0 flex flex-col gap-3 z-10">
+            <span class="absolute text-sm -top-6">{{ gaugeSpan }}</span>
+            <Icon
+              name="fluent-mdl2:total"
+              class="flex text-white hover:cursor-pointer"
+              @click="
+                handleKdaGauge('Total', {
+                  kills: totalKills,
+                  deaths: totalDeaths,
+                  assists: totalAssists,
+                })
+              "
+            />
+            <Icon
+              name="icon-park-outline:average"
+              class="flex text-white hover:cursor-pointer"
+              @click="
+                handleKdaGauge('Moyenne', {
+                  kills: totalKills / kdaPerGame.length,
+                  deaths: totalDeaths / kdaPerGame.length,
+                  assists: totalAssists / kdaPerGame.length,
+                })
+              "
+            />
+          </div>
           <GraphGaugeChart
             :series="{
               kills: totalKills,
               deaths: totalDeaths,
               assists: totalAssists,
             }"
+            graphId="kdaGraph"
             dataType="KDA"
             class="col-span-2 row-span-1"
           />
@@ -32,11 +59,13 @@
       <!-- w-96 -->
       <GraphPieChart
         :series="mapsSeries"
+        graphId="mapsDispatchGraph"
         dataType="Map"
         class="h-full rounded"
       />
       <GraphHBarChart
         :series="mapWinRate"
+        graphId="mapWRGraph"
         dataType="WinRate"
         class="h-full rounded"
       />
@@ -62,6 +91,7 @@ const assistsPerGame: Ref<Array<number>> = ref([]);
 const totalKills: Ref<number> = ref(0);
 const totalDeaths: Ref<number> = ref(0);
 const totalAssists: Ref<number> = ref(0);
+const gaugeSpan: Ref<string> = ref("");
 
 // watchEffect(() => {
 //   // console.log("New Player: ", newPlayer);
@@ -206,5 +236,13 @@ const handleUpdateKda = (kda) => {
   totalKills.value = kda.kills;
   totalDeaths.value = kda.deaths;
   totalAssists.value = kda.assists;
+};
+
+const handleKdaGauge = (spanTitle, data) => {
+  console.log("ACTION update KDA", data);
+  gaugeSpan.value = spanTitle;
+  totalKills.value = data.kills;
+  totalDeaths.value = data.deaths;
+  totalAssists.value = data.assists;
 };
 </script>
