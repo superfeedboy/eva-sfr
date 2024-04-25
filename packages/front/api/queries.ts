@@ -2,7 +2,7 @@ interface Queries {
   [key: string]: string;
 }
 
-export const queries: Queries = {
+export const gqlQuery: Queries = {
   playersList: `
     query {
         players {
@@ -11,6 +11,29 @@ export const queries: Queries = {
             name
         }
     }`,
+  fullPlayersDatas: `
+    query {
+        players {
+            playerid
+            pseudo
+            name
+            scores {
+                game {
+                    date
+                    map
+                    team1Score
+                    team2Score
+                    win
+                }
+                kills
+                deaths
+                assists
+                kda
+                points
+            }
+        }
+    }
+    `,
   playerDatas: `
     query GetPlayerData($playerid: ID!) {
         player(playerid: $playerid) {
