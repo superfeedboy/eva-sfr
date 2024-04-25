@@ -1,23 +1,30 @@
 <template>
-  <h1 class="text-xl bold">{{ player.pseudo }}</h1>
-  <div class="grid grid-flow-dense grid-cols-6 grid-rows-4 gap-4">
-    <!-- <pre>{{ playerDatas }}</pre> -->
+  <h1 class="text-xl bold">{{ playerDatas.pseudo }}</h1>
+  <div class="grid grid-cols-1 xl:grid-cols-6 gap-y-4 xl:gap-4">
+    <!-- grid-flow-dense auto-rows-auto grid-rows-4 -->
+    <div
+      class="w-full h-28 row-span-1 col-span-6 grid grid-cols-5 grid-flow-dense grid-row-subgrid gap-8 p-4"
+    >
+      <GraphDataTile title="Games" :data="totalGames" />
+      <GraphDataTile title="Victoires" :data="totalWins" />
+      <GraphDataTile title="Win Rate" :data="`${globalWinRate}%`" />
+      <GraphDataTile
+        title="KDA moyen"
+        :data="
+          Math.round(
+            ((totalKills + totalAssists) /
+              (totalDeaths === 0 ? 1 : totalDeaths)) *
+              100
+          ) / 100
+        "
+      />
+      <GraphDataTile title="Points moyens" :data="totalPoints" />
+    </div>
     <div class="row-span-2 col-span-4 h-full rounded">
       <div class="h-full grid grid-rows-3 grid-flow-col gap-4">
-        <GraphLineChart
-          :series="{
-            kda: kdaPerGame,
-            kills: killsPerGame,
-            deaths: deathsPerGame,
-            assists: assistsPerGame,
-          }"
-          graphId="fullKdaGraph"
-          @updateKda="handleUpdateKda"
-          dataType="Score"
-          class="row-span-2"
-        />
+        <InidividualKDAPerGame />
         <div class="relative grid grid-cols-6">
-          <div class="absolute top-0 left-0 flex flex-col gap-3 z-10">
+          <!-- <div class="absolute top-0 left-0 flex flex-col gap-3 z-10">
             <span class="absolute text-sm -top-6">{{ gaugeSpan }}</span>
             <Icon
               name="fluent-mdl2:total"
@@ -41,7 +48,7 @@
                 })
               "
             />
-          </div>
+          </div> -->
           <GraphGaugeChart
             :series="{
               kills: totalKills,
@@ -52,35 +59,63 @@
             dataType="KDA"
             class="col-span-2 row-span-1"
           />
+          <InidividualKDAPerSession />
+          <!-- <GraphGaugeChart
+            :series="{
+              kills: totalKills,
+              deaths: totalDeaths,
+              assists: totalAssists,
+            }"
+            graphId="kdaGraph"
+            dataType="KDA"
+            class="col-span-2 row-span-1"
+          />
+          <GraphGaugeChart
+            :series="{
+              kills: totalKills,
+              deaths: totalDeaths,
+              assists: totalAssists,
+            }"
+            graphId="kdaGraph"
+            dataType="KDA"
+            class="col-span-2 row-span-1"
+          /> -->
         </div>
       </div>
     </div>
-    <div class="row-span-2 col-span-2 grid grid-flow-row gap-4 h-auto">
+    <div
+      class="row-span-2 col-span-2 grid lg:grid-flow-col grid-flow-row lg:grid-cols-6 xl:grid-cols-1 xl:grid-flow-row gap-2 xl:gap-0 xl:gap-y-4 h-auto"
+    >
       <!-- w-96 -->
       <GraphPieChart
         :series="mapsSeries"
         graphId="mapsDispatchGraph"
         dataType="Map"
-        class="h-full rounded"
+        class="h-full rounded lg:col-span-2"
       />
       <GraphHBarChart
         :series="mapWinRate"
         graphId="mapWRGraph"
         dataType="WinRate"
-        class="h-full rounded"
+        class="h-full rounded lg:col-span-4"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs } from "vue";
+import { ref } from "vue";
+import { dataCompute } from "./graph/utils/dataCompute";
+import { useDataStore } from "~/stores/datas.store";
+import { useGraphsStore } from "~/stores/graphs.store";
 
-const props = defineProps({
-  player: Object,
-  playerDatas: Object,
-});
-const { player, playerDatas } = toRefs(props);
+import type { Player } from "~/types/DatasSchemes.dt";
+
+const dataStore = useDataStore();
+const graphStore = useGraphsStore();
+console.log(dataStore.datas.playerDatas);
+
+const playerDatas: Ref<Player> = ref({} as Player);
 const mapsSeries: Ref<Array<object>> = ref([]);
 const mapWinRate: Ref<Array<object>> = ref([]);
 const kdaDatas: Ref<Array<object>> = ref([]);
@@ -88,10 +123,33 @@ const kdaPerGame: Ref<Array<number>> = ref([]);
 const killsPerGame: Ref<Array<number>> = ref([]);
 const deathsPerGame: Ref<Array<number>> = ref([]);
 const assistsPerGame: Ref<Array<number>> = ref([]);
+const totalGames: Ref<number> = ref(0);
+const totalWins: Ref<number> = ref(0);
+const globalWinRate: Ref<number> = ref(0);
 const totalKills: Ref<number> = ref(0);
 const totalDeaths: Ref<number> = ref(0);
 const totalAssists: Ref<number> = ref(0);
+const totalPoints: Ref<number> = ref(0);
 const gaugeSpan: Ref<string> = ref("");
+
+watch(
+  () => dataStore.datas.playerDatas,
+  (newPlayerDatas) => {
+    playerDatas.value = newPlayerDatas.player;
+    console.log("PlayerDatas: ", newPlayerDatas);
+    graphStore.setGraph(
+      "individualKDAPerGame",
+      dataCompute.individualKDAPerGame(playerDatas.value.scores),
+      { xAxis: { data: kdaDatas.value.map((item) => item.name) } }
+    );
+    // Appel à dataCompute pour déterminer le winrate global
+    totalWins.value = dataCompute.totalWins(playerDatas.value.scores);
+    // globalWinRate.value = dataCompute.globalWinRate(
+    //   totalWins.value,
+    //   totalGames.value
+    // );
+  }
+);
 
 // watchEffect(() => {
 //   // console.log("New Player: ", newPlayer);
@@ -104,8 +162,10 @@ const gaugeSpan: Ref<string> = ref("");
 //   }
 // });
 
+console.log("PlayerDatas: ", playerDatas.value);
+
 watch(playerDatas, (newPlayerDatas) => {
-  // console.log("log:", playerDatas.value.player.scores);
+  totalGames.value = newPlayerDatas.scores.length;
   mapsSeries.value.splice(0, mapsSeries.value.length);
   mapWinRate.value = [];
   kdaDatas.value.splice(0, kdaDatas.value.length);
@@ -113,9 +173,6 @@ watch(playerDatas, (newPlayerDatas) => {
   killsPerGame.value = [];
   deathsPerGame.value = [];
   assistsPerGame.value = [];
-  // killsPerGame.value.splice(0, killsPerGame.value.length);
-  // deathsPerGame.value.splice(0, deathsPerGame.value.length);
-  // assistsPerGame.value.splice(0, assistsPerGame.value.length);
   totalKills.value = 0;
   totalDeaths.value = 0;
   totalAssists.value = 0;
@@ -123,8 +180,13 @@ watch(playerDatas, (newPlayerDatas) => {
     mapsSeries.value = [];
     return;
   }
+  globalWinRate.value = dataCompute.globalWinRate(
+    totalWins.value,
+    totalGames.value
+  );
+  totalPoints.value = dataCompute.totalPoints(newPlayerDatas.scores);
 
-  const mapCounts = newPlayerDatas.player.scores.reduce((counts, data) => {
+  const mapCounts = newPlayerDatas.scores.reduce((counts, data) => {
     // console.log("Counts: ", counts);
     // console.log("Data: ", data);
 
@@ -136,7 +198,7 @@ watch(playerDatas, (newPlayerDatas) => {
     return counts;
   }, {});
 
-  const mapStats = newPlayerDatas.player.scores.reduce((stats, score) => {
+  const mapStats = newPlayerDatas.scores.reduce((stats, score) => {
     const mapName = score.game.map;
     if (!stats[mapName]) {
       stats[mapName] = { totalGames: 0, wins: 0 };
@@ -161,7 +223,7 @@ watch(playerDatas, (newPlayerDatas) => {
     }))
     .sort((a, b) => a.value - b.value);
 
-  const dataByDay = newPlayerDatas.player.scores.reduce((acc, score) => {
+  const dataByDay = newPlayerDatas.scores.reduce((acc, score) => {
     const date = score.game.date.split("T")[0]; // Assuming score.game.date is a timestamp
     if (!acc[date]) {
       acc[date] = {
@@ -189,7 +251,7 @@ watch(playerDatas, (newPlayerDatas) => {
     // };
   });
 
-  newPlayerDatas.player.scores.map((score) => {
+  newPlayerDatas.scores.map((score) => {
     // console.log("Score: ", score);
     const date = new Date(score.game.date);
     const formattedDate = `${date.getDate().toString().padStart(2, "0")}/${(
