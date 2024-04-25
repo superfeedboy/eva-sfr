@@ -38,23 +38,20 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits, defineProps } from "vue";
-
+import type { LeftMenu } from "~/types/Menus.dt";
 const props = defineProps({
   activeDashboard: { type: Number, default: 1 },
 });
 
 const { activeDashboard } = toRefs(props);
 const emit = defineEmits();
-const menuItems = [
+const menuItems: LeftMenu = [
   { id: 1, name: "Joueur", icon: "mdi:account" },
   { id: 2, name: "Equipes", icon: "mdi:account-supervisor" },
   { id: 3, name: "Global", icon: "mdi:account-supervisor-circle-outline" },
 ];
 
 const updateActiveDashboard = (id: number, name: string) => {
-  console.log("Activating dashboard", id);
-
   emit("update:activeDashboard", { id: id, name: name });
 };
 </script>

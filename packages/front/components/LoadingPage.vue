@@ -1,6 +1,7 @@
 <template>
   <div class="flex w-full justify-center">
     <img
+      v-if="logo !== false"
       src="/images/eva-sfr-logo.png"
       alt="logo"
       class="w-64 h-64 p-0 hover:drop-shadow-2xl animate-pulse"
@@ -14,10 +15,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-
 const props = defineProps({
   info: String,
+  logo: {
+    type: Boolean,
+    default: true,
+    required: false,
+  },
 });
 
 const { info } = toRefs(props);
