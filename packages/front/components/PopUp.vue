@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute top-0 left-0 m-2 md:w-auto sm:w-full">
+  <div class="absolute top-14 right-0 m-2 md:w-auto sm:w-full">
     <transition-group name="fade" tag="div">
       <div
         v-for="(popUp, index) in oldestPopUps"

@@ -22,20 +22,17 @@ import type { Dashboard } from "../types/Dashboard.dt";
 
 const activeDashboard: Ref<Dashboard> = ref({ id: 1, name: "Joueur" });
 const dataStore = useDataStore();
+const { isLoading } = toRefs(dataStore);
 
-const handleActiveDashboardUpdate = (newActiveDashboard: Dashboard) => {
+const handleActiveDashboardUpdate = (newActiveDashboard: Dashboard): void => {
   activeDashboard.value = newActiveDashboard;
 };
 
-onMounted(async () => {
-  console.log("Dashboard loaded");
+onMounted(async (): Promise<void> => {
   try {
     await dataStore.getDatas();
   } catch (error) {
     console.error(error);
   }
 });
-
-const { isLoading } = toRefs(dataStore);
-// const isLoading = true;
 </script>
